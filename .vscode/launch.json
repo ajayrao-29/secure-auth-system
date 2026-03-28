@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run JobMarketAnalyzerApplication",
+      "request": "launch",
+      "mainClass": "com.jobmarket.analyzer.JobMarketAnalyzerApplication",
+      "projectName": "job-market-analyzer"
+    }
+  ]
+}
