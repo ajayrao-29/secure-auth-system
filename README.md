@@ -1,126 +1,240 @@
-<<<<<<< HEAD
-# Secure Authentication & Authorization System
+# 🔐 Secure Authentication Backend (Spring Boot + JWT)
 
-Spring Boot backend implementing JWT authentication, refresh tokens, role-based access control, rate limiting, input validation, BCrypt password hashing, and account lockout.
+## 📌 Overview
 
-## Endpoints
+This project is a **secure authentication and authorization backend system** built using Spring Boot, Spring Security, JWT, and MySQL.
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/refresh-token`
-- `GET /api/user/profile`
-- `GET /api/admin/dashboard`
+It provides a production-style implementation of:
 
-## Sample Requests
+* User Registration & Login
+* JWT-based Authentication (stateless)
+* Refresh Token mechanism
+* Role-Based Access Control (USER / ADMIN)
+* Account Lock after multiple failed login attempts
+* Rate Limiting to prevent abuse
 
-### Register
+---
 
-```json
-{
-  "username": "john_admin",
-  "email": "john@example.com",
-  "password": "StrongPass1!"
-}
-```
+## ⚙️ Tech Stack
 
-### Login
+* **Backend:** Spring Boot
+* **Security:** Spring Security
+* **Authentication:** JWT (jjwt)
+* **Database:** MySQL
+* **ORM:** JPA / Hibernate
+* **Build Tool:** Maven
+* **Testing:** Postman
 
-```json
-{
-  "username": "john_admin",
-  "password": "StrongPass1!"
-}
-```
+---
 
-### Refresh Token
+## 🏗️ Architecture
 
-```json
-{
-  "refreshToken": "2d9d2f2d-1234-4567-89ab-1234567890ab.56d1ecfe-2234-5566-87ab-1234567890ab"
-}
-```
+The project follows a layered architecture:
 
-## Sample Success Response
+Controller → Service → Repository → Database
 
-```json
-{
-  "accessToken": "<jwt-access-token>",
-  "refreshToken": "<refresh-token>",
-  "tokenType": "Bearer",
-  "expiresIn": 900,
-  "username": "john_admin",
-  "role": "ROLE_USER"
-}
-```
+* **Controller:** Handles HTTP requests
+* **Service:** Contains business logic
+* **Repository:** Interacts with database
+* **Entity:** Maps Java objects to database tables
 
-## Sample Error Response
+---
 
-```json
-{
-  "timestamp": "2026-03-28T12:00:00Z",
-  "status": 400,
-  "error": "Bad Request",
-  "message": "Validation failed",
-  "path": "/api/auth/register",
-  "details": [
-    "password: Password must contain uppercase, lowercase, number, and special character"
-  ]
-}
-```
+## 🚀 Features
 
-## Running
+* 🔐 Secure authentication using JWT
+* 🔑 Refresh token support for session continuity
+* 👤 Role-based authorization (USER / ADMIN)
+* 🔒 Password hashing using BCrypt
+* 🚫 Account lock after 5 failed login attempts
+* ⚡ Rate limiting for API protection
+* ✅ Input validation and global exception handling
 
-1. Set `JWT_SECRET` to a secure Base64-encoded secret of at least 32 bytes.
-2. Set `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`.
-3. Optionally set `BOOTSTRAP_ADMIN_ENABLED=true` plus `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_EMAIL`, and `BOOTSTRAP_ADMIN_PASSWORD` to seed an admin account.
-4. Run `./mvnw spring-boot:run`
+---
 
-## Postman Testing
+## 🛢️ Database Design
 
-### Register
+### Users Table
 
-- Method: `POST`
-- URL: `http://localhost:8080/api/auth/register`
-- Header: `Content-Type: application/json`
+* id
+* username
+* email
+* password (hashed)
+* role
+* failed_attempts
+* account_locked
 
-```json
-{
-  "username": "john_user",
-  "email": "john@example.com",
-  "password": "StrongPass1!"
-}
-```
+### Refresh Tokens Table
 
-### Login
+* token
+* user reference
+* expiry
+* revoked flag
 
-- Method: `POST`
-- URL: `http://localhost:8080/api/auth/login`
-- Header: `Content-Type: application/json`
+---
 
-```json
-{
-  "username": "john_user",
-  "password": "StrongPass1!"
-}
-```
+## 🔐 Security Implementation
 
-### Profile
+### 🔸 BCrypt Password Hashing
 
-- Method: `GET`
-- URL: `http://localhost:8080/api/user/profile`
-- Header: `Authorization: Bearer <access-token>`
+* Passwords are never stored in plain text
+* Hashed using `BCryptPasswordEncoder`
+* Verified using `matches()` during login
 
-### Refresh Token
+---
 
-- Method: `POST`
-- URL: `http://localhost:8080/api/auth/refresh-token`
-- Header: `Content-Type: application/json`
+### 🔸 JWT Authentication
 
-```json
-{
-  "refreshToken": "<refresh-token>"
-}
-```
-=======
-# secure-auth-system
->>>>>>> feeeaab5a90c25278349139b9ed8acdb94b4af15
+* Stateless authentication (no session storage)
+* Token contains user identity
+* Signed using a secret key
+
+---
+
+### 🔸 JWT Filter
+
+* Intercepts every request
+* Extracts token from header
+* Validates token
+* Sets authentication context
+
+---
+
+### 🔸 Role-Based Access
+
+* `/api/auth/**` → Public
+* `/api/user/**` → Authenticated users
+* `/api/admin/**` → Admin only
+
+---
+
+### 🔸 Refresh Token
+
+* Stored in database
+* Used to generate new access tokens
+* Supports token rotation
+
+---
+
+### 🔸 Account Lock
+
+* Locks account after 5 failed attempts
+* Prevents brute-force attacks
+
+---
+
+### 🔸 Rate Limiting
+
+* Limits repeated requests
+* Protects system from abuse
+
+---
+
+## 🔁 API Endpoints
+
+### 🔐 Authentication
+
+* **POST** `/api/auth/register`
+* **POST** `/api/auth/login`
+* **POST** `/api/auth/refresh-token`
+
+---
+
+### 👤 User
+
+* **GET** `/api/user/profile`
+
+Header:
+Authorization: Bearer <accessToken>
+
+---
+
+### 👑 Admin
+
+* **GET** `/api/admin/dashboard`
+
+---
+
+## 🧪 Testing (Postman)
+
+1. Register a user
+2. Login using credentials
+3. Copy the access token
+4. Use token to call protected APIs
+
+---
+
+## ⚙️ Setup & Run
+
+### 1. Clone Repository
+
+git clone https://github.com/ajayrao-29/secure-auth-system.git
+
+---
+
+### 2. Configure Environment Variables
+
+Windows (PowerShell):
+
+JWT_SECRET=your_base64_secret
+DB_URL=jdbc:mysql://localhost:3306/secure_auth_db
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+---
+
+### 3. Run Application
+
+./mvnw spring-boot:run
+
+---
+
+## 📁 Project Structure
+
+src/main/java/com/secureauth/system
+
+* controller/
+* service/
+* repository/
+* entity/
+* dto/
+* security/
+* config/
+* exception/
+* util/
+
+---
+
+## ⚠️ Important Notes
+
+* Do NOT expose real database credentials
+* Always use environment variables for secrets
+* JWT_SECRET must be strong and Base64 encoded
+
+---
+
+## 📈 Future Improvements
+
+* OAuth2 integration (Google / GitHub login)
+* Redis for caching and distributed rate limiting
+* Email verification & password reset flow
+* API documentation using Swagger/OpenAPI
+* Design and integrate a frontend UI (React) to build a full-stack application
+
+---
+
+## 🎯 Key Learnings
+
+* Spring Security internals
+* JWT authentication flow
+* Secure password handling
+* API protection strategies
+* Real-world backend security design
+
+---
+
+## 👨‍💻 Author
+
+Ajay Rao
+
+---
